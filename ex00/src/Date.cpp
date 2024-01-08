@@ -1,30 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   Date.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: estruckm <estruckm@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/08 13:22:48 by estruckm          #+#    #+#             */
-/*   Updated: 2024/01/08 13:22:48 by estruckm         ###   ########.fr       */
+/*   Created: 2024/01/08 23:22:03 by estruckm          #+#    #+#             */
+/*   Updated: 2024/01/08 23:22:03 by estruckm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/BitcoinExchange.hpp"
+#include "../includes/Date.hpp"
 
-int main (int argc, char **argv) {
+Date::Date(std::string date) {
 
-	if (argc != 2) {
-		std::cout << "Usage: ./bitcoin [file]" << std::endl;
-		return 1;
+}
+
+Date::~Date() {}
+
+void Date::parseDate(std::string date) {
+
+}
+bool Date::isValidDate(std::string date) {
+
+}
+
+
+Date &Date::operator=(Date const &rhs) {
+	if (this != &rhs) {
 	}
-	BitcoinExchange btcExchange = BitcoinExchange("data.csv", argv[1]);
-	try {
-//		btcExchange.getAccountBalance();
-		btcExchange.test();
-	}
-	catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
-	}
-	return 0;
+	return *this;
+}
+
+const char *Date::InvalidDateException::what() const throw() {
+	return "Invalid date";
 }
