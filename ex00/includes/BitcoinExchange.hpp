@@ -42,14 +42,11 @@ class BitcoinExchange {
 		void test();
 
 	private:
-		std::map<std::string, std::string> _exchangeRates;
-		std::map<std::string, std::string> _accountInfo;
+		std::map<Date, double> _exchangeRates;
+		std::map<Date, double> _accountInfo;
 
 		void _storeExchangeRates(std::string file);
 		void _storeAccountInfo(std::string file);
-
-		void _printMapContainer(std::map<std::string, std::string> &container);
-
 		void _isValidFile(std::string file);
 		std::string _getLine(std::ifstream &f);
 		std::string _getDate(std::string &line);
@@ -58,12 +55,15 @@ class BitcoinExchange {
 		void _isValidDate(std::string date);
 		void _isValidAmount(std::string amount);
 
-		bool isValidNumber(std::string s);
-		std::string _nearestDate(std::string date);
+		Date _nearestDate(Date searchDate);
 		class InvalidFileException : public std::exception {
 		public:
 			virtual const char *what() const throw();
 		};
+	class InvalidFileContent : public std::exception {
+	public:
+		virtual const char *what() const throw();
+	};
 };
 
 #endif

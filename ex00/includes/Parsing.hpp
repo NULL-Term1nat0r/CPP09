@@ -15,10 +15,13 @@
 
 #include <string>
 #include <sstream>
+#include <stdexcept>
 
 class Parsing {
 	public:
 		static int stoi(std::string);
+		static double stod(const std::string& str);
+		static bool isValidNumber(std::string s);
 		class InvalidConversion : std::exception {
 			virtual const char *what() const throw();
 		};

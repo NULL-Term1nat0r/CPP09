@@ -17,11 +17,13 @@
 #include <sstream>
 #include "Colors.hpp"
 
+#include "Parsing.hpp"
+
 class Date {
 public:
 	Date(std::string date);
+	Date &operator=(Date const &rhs);
 	~Date();
-	void parseDate(std::string date);
 	bool isValidDate(const std::string &date);
 
 	std::string _getYear(std::string date);
@@ -32,20 +34,24 @@ public:
 	int _getCurrentMonth();
 	int _getCurrentDay();
 
-	Date &operator=(Date const &rhs);
-	Date &operator<(Date const &rhs);
-	Date &operator>(Date const &rhs);
-	Date &operator<=(Date const &rhs);
-	Date &operator>=(Date const &rhs);
-	Date &operator==(Date const &rhs);
+	bool _isValidDayInMonth(int year, int month, int day);
+	bool _isLeapYear(int year);
+
+	bool operator<(Date const &rhs) const;
+	bool operator>(Date const &rhs) const;
+	bool operator<=(Date const &rhs) const;
+	bool operator>=(Date const &rhs) const;
+	bool operator==(Date const &rhs) const;
+
+	friend std::ostream& operator<<(std::ostream& os, const Date& date);
 
 	int _currentDay;
 	int _currentMonth;
 	int _currentYear;
-
 	int _day;
 	int _month;
-	int year;
+	int _year;
+
 	class InvalidDateException : public std::exception {
 	public:
 		virtual const char *what() const throw();

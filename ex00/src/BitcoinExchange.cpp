@@ -38,82 +38,99 @@ const char *BitcoinExchange::InvalidFileException::what() const throw() {
 	return "Invalid file";
 }
 
+const char *BitcoinExchange::InvalidFileContent::what() const throw() {
+	return "Invalid file content";
+}
+
+
 void BitcoinExchange::test() {
-	Date a = Date("2024-12-01");
-}
-
-bool BitcoinExchange::isValidNumber(std::string number) {
-	int length = number.length();
-	if (length == 0)
-		return false;
-	if (length > 1 && (number[0] == '-' || number[0] == '+') && number[1] == '0')
-		return false;
-	if (length > 1 && number[0] == '0' && number[1] != '.' && number[1] != 'f')
-		return false;
-	if (length == 1 && (number[0] == '-' || number[0] == '+'))
-		return false;
-	int dotCounter = 0;
-	for (std::size_t i = 0; i < length; ++i) {
-		if (!isdigit(number[i])) {
-			if (i == 0 && (number[i] == '-' || number[i] == '+'))
-				continue;
-			if (number[i] == '.' && dotCounter == 0)  {
-				++dotCounter;
-				continue;
-			}
-			if (i == length - 1 && number[i] == 'f')
-				return true;
-			else
-				return false;
-		}
-	}
-	return true;  // All characters are digits
+	Date a = Date("20g8-02-29");
 }
 
 
-std::string BitcoinExchange::_nearestDate(std::string date) {
-	std::map<std::string, std::string>::iterator it = _exchangeRates.begin();
-	std::map<std::string, std::string>::iterator end = _exchangeRates.end();
-	std::string nearestDate = it->first;
+Date BitcoinExchange::_nearestDate(Date searchDate) {
+	std::map<Date, double>::iterator it = _exchangeRates.begin();
+	std::map<Date, double>::iterator end = _exchangeRates.end();
+	if (it == end)
+		throw InvalidFileContent();
+	Date nearestDate = it->first;
 	while (it != end) {
-		if (std::abs(std::stof(it->first) - std::stof(date)) < std::abs(std::stof(nearestDate) - std::stof(date)))
+		if (it->first <= searchDate && (nearestDate <= it->first)) {
 			nearestDate = it->first;
+		}
 		it++;
 	}
 	return nearestDate;
 }
 
 void BitcoinExchange::_storeExchangeRates(std::string file) {
-	_isValidFile(file);
+	try {
+		_isValidFile(file);
+	}
+	catch (std::exception &e){
+		std::cout << red << e.what() << resetColor << std::endl;
+	}
 	std::ifstream f(file);
-	std::string line = _getLine(f);
+	_getLine(f);
+	int lineCounter = 2;
 	while (f.good()) {
 		std::string line = _getLine(f);
-		_exchangeRates[_getDate(line)] = _getPrice(line);
+		std::string dateString = _getDate(line);
+		std::string priceString = _getPrice(line);
+		try {
+			Date date(dateString);
+			double price = stod(priceString);
+			_exchangeRates[date] = price;
+		}
+		catch (std::exception &e) {
+			std::cout << red <<  "Error in line " << lineCounter << " in " << file << " file" << resetColor << std::endl;
+			std::cout << e.what() << std::endl;
+		}
+		lineCounter++;
 	}
+	std::cout << boldBackgroundCyan  << "all Exchange/Rate data has been read!" << resetColor << std::endl;
 }
 
 void BitcoinExchange::_storeAccountInfo(std::string file) {
-	_isValidFile(file);
+	try {
+		_isValidFile(file);
+	}
+	catch (std::exception &e){
+		std::cout << red << e.what() << resetColor << std::endl;
+	}
 	std::ifstream f(file);
-	std::string line = _getLine(f);
+	_getLine(f); // skip first line of headers in file
+	int lineCounter = 2;
 	while (f.good()) {
 		std::string line = _getLine(f);
-		_accountInfo[_getDate(line)] = _getAmount(line);
+		std::string dateString = _getDate(line);
+		std::string amountString = _getAmount(line);
+		try {
+			Date date(dateString);
+			double amount = stod(amountString);
+			_accountInfo[date] = amount;
+		}
+		catch (std::exception &e) {
+			std::cout << red <<  "Error in line " << lineCounter << " in " << file << " file" << resetColor << std::endl;
+			std::cout << e.what() << std::endl;
+		}
+		lineCounter++;
 	}
+	std::cout << boldBackgroundMagenta << "all Account data has been read!" << resetColor << std::endl;
 }
 
 void BitcoinExchange::getAccountBalance() {
-	std::map<std::string, std::string>::iterator it = _accountInfo.begin();
-	std::map<std::string, std::string>::iterator end = _accountInfo.end();
+	std::map<Date, double>::iterator it = _accountInfo.begin();
+	std::map<Date, double>::iterator end = _accountInfo.end();
 
 	while (it != end) {
-		std::string date = it->first;
-		std::string amount = it->second;
-		std::string nearestDate = _nearestDate(date);
-		std::string price = _exchangeRates[nearestDate];
-		float balance = std::stof(amount) * std::stof(price);
-		std::cout << cyan << date << " " << amount << " " << nearestDate << " " << price << " " << balance << resetColor << std::endl;
+		Date date = it->first;
+		double amount = it->second;
+		Date nearestDate = _nearestDate(date);
+		double price = _exchangeRates[nearestDate];
+		double balance = amount * price;
+		std::cout << "["<< cyan << date << " " << amount << "] ----> ["<< nearestDate << " " << price << "] " << resetColor;
+		std::cout << boldBackgroundMagenta << "----> " << balance << resetColor << std::endl;
 		it++;
 	}
 }
@@ -122,19 +139,6 @@ void BitcoinExchange::_isValidFile(std::string file){
 	std::ifstream f(file);
 	if (!f.good())
 		throw InvalidFileException();
-}
-
-void BitcoinExchange::_isValidInput(std::string input) {
-	_isValidFile(input);
-	std::ifstream f(input);
-	std::string line = _getLine(f);
-	while (f.good()) {
-		std::string line = _getLine(f);
-		_accountInfo[_getDate(line)] = _getAmount(line);
-		std::cout << _getDate(line) << " " << _getAmount(line) << std::endl;
-	}
-	_printMapContainer(_accountInfo);
-
 }
 
 std::string BitcoinExchange::_getLine(std::ifstream &f) {
@@ -168,13 +172,4 @@ std::string BitcoinExchange::_getPrice(std::string &line) {
 	int end = line.find("\n", start);
 	price = line.substr(start, end - start);
 	return price;
-}
-
-void BitcoinExchange::_printMapContainer(std::map <std::string, std::string> &container) {
-	std::map<std::string, std::string>::iterator it = container.begin();
-	std::map<std::string, std::string>::iterator end = container.end();
-	while (it != end) {
-		std::cout << cyan << it->first << " " << it->second << resetColor << std::endl;
-		it++;
-	}
 }

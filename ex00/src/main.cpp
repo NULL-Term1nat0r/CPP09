@@ -20,8 +20,7 @@ int main (int argc, char **argv) {
 	}
 	BitcoinExchange btcExchange = BitcoinExchange("data.csv", argv[1]);
 	try {
-//		btcExchange.getAccountBalance();
-		btcExchange.test();
+		btcExchange.getAccountBalance();
 	}
 	catch (std::exception &e) {
 		std::cout << e.what() << std::endl;
