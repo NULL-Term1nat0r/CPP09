@@ -18,8 +18,8 @@ int main (int argc, char **argv) {
 		std::cout << "Usage: ./bitcoin [file]" << std::endl;
 		return 1;
 	}
-	BitcoinExchange btcExchange = BitcoinExchange("data.csv", argv[1]);
 	try {
+		BitcoinExchange btcExchange = BitcoinExchange("data.csv", argv[1]);
 		btcExchange.getAccountBalance();
 	}
 	catch (std::exception &e) {

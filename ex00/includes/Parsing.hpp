@@ -16,6 +16,7 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <iostream>
 
 class Parsing {
 	public:
@@ -23,7 +24,12 @@ class Parsing {
 		static double stod(const std::string& str);
 		static bool isValidNumber(std::string s);
 		class InvalidConversion : std::exception {
-			virtual const char *what() const throw();
+			public:
+				virtual const char *what() const throw();
+		};
+		class InvalidValueRange : std::exception {
+			public:
+				virtual const char *what() const throw();
 		};
 };
 

@@ -75,11 +75,11 @@ void BitcoinExchange::_storeExchangeRates(std::string file) {
 	int lineCounter = 2;
 	while (f.good()) {
 		std::string line = _getLine(f);
-		std::string dateString = _getDate(line);
+		std::string dateString = _getDateExchange(line);
 		std::string priceString = _getPrice(line);
 		try {
 			Date date(dateString);
-			double price = stod(priceString);
+			double price = Parsing::stod(priceString);
 			_exchangeRates[date] = price;
 		}
 		catch (std::exception &e) {
@@ -103,12 +103,19 @@ void BitcoinExchange::_storeAccountInfo(std::string file) {
 	int lineCounter = 2;
 	while (f.good()) {
 		std::string line = _getLine(f);
-		std::string dateString = _getDate(line);
+		std::string dateString = _getDateAccount(line);
 		std::string amountString = _getAmount(line);
 		try {
 			Date date(dateString);
-			double amount = stod(amountString);
+			int amount = Parsing::stoi(amountString);
+			if (amount < 0  || amount > 1000)
+				throw Parsing::InvalidValueRange();
 			_accountInfo[date] = amount;
+		}
+		catch (const Parsing::InvalidValueRange& e) {
+			// Handle InvalidValueRange exception
+			std::cout << red << "Error in line " << lineCounter << " in " << file << " file" << resetColor << std::endl;
+			std::cout << e.what() << std::endl;
 		}
 		catch (std::exception &e) {
 			std::cout << red <<  "Error in line " << lineCounter << " in " << file << " file" << resetColor << std::endl;
@@ -120,9 +127,10 @@ void BitcoinExchange::_storeAccountInfo(std::string file) {
 }
 
 void BitcoinExchange::getAccountBalance() {
-	std::map<Date, double>::iterator it = _accountInfo.begin();
-	std::map<Date, double>::iterator end = _accountInfo.end();
-
+	std::map<Date, int>::iterator it = _accountInfo.begin();
+	std::map<Date, int>::iterator end = _accountInfo.end();
+	if (it == end)
+		throw InvalidFileContent();
 	while (it != end) {
 		Date date = it->first;
 		double amount = it->second;
@@ -130,7 +138,7 @@ void BitcoinExchange::getAccountBalance() {
 		double price = _exchangeRates[nearestDate];
 		double balance = amount * price;
 		std::cout << "["<< cyan << date << " " << amount << "] ----> ["<< nearestDate << " " << price << "] " << resetColor;
-		std::cout << boldBackgroundMagenta << "----> " << balance << resetColor << std::endl;
+		std::cout << magenta << "----> " << resetColor << boldBackgroundMagenta << balance << resetColor << std::endl;
 		it++;
 	}
 }
@@ -147,16 +155,23 @@ std::string BitcoinExchange::_getLine(std::ifstream &f) {
 	return line;
 }
 
-std::string BitcoinExchange::_getDate(std::string &line) {
+std::string BitcoinExchange::_getDateExchange(std::string &line) {
 	std::string date;
 	std::stringstream ss(line);
 	std::getline(ss, date, ',');
 	return date;
 }
 
+std::string BitcoinExchange::_getDateAccount(std::string &line) {
+	std::string date;
+	std::stringstream ss(line);
+	std::getline(ss, date, ' ');
+	return date;
+}
+
 std::string BitcoinExchange::_getAmount(std::string &line) {
 	std::string amount;
-	int start = line.find(",") + 1;
+	int start = line.find("|") + 1;
 	while (line[start] == ' ')
 		start++;
 	int end = line.find("\n", start);

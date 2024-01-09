@@ -43,13 +43,14 @@ class BitcoinExchange {
 
 	private:
 		std::map<Date, double> _exchangeRates;
-		std::map<Date, double> _accountInfo;
+		std::map<Date, int> _accountInfo;
 
 		void _storeExchangeRates(std::string file);
 		void _storeAccountInfo(std::string file);
 		void _isValidFile(std::string file);
 		std::string _getLine(std::ifstream &f);
-		std::string _getDate(std::string &line);
+		std::string _getDateExchange(std::string &line);
+		std::string _getDateAccount(std::string &line);
 		std::string _getAmount(std::string &line);
 		std::string _getPrice(std::string &line);
 		void _isValidDate(std::string date);

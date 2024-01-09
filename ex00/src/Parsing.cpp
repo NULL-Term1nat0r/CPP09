@@ -12,23 +12,28 @@
 
 #include "../includes/Parsing.hpp"
 
-int Parsing::stoi(std::string string){
+int Parsing::stoi(std::string string) {
 	int result;
 	std::istringstream iss(string);
 
-	if (!(iss >> std::skipws >> result) || !iss.eof())
+	if (!(iss >> result) || (iss.fail() && !iss.eof())) {
 		throw InvalidConversion();
+	}
+
+//	if (result < 0 || result > 1000) {
+//		std::cout << "string to convert: " << string << std::endl;
+//		throw InvalidValueRange();
+//	}
+
 	return result;
 }
+
 
 double Parsing::stod(const std::string& str) {
 	double result;
 	std::istringstream iss(str);
-	char remainingChar;
-
-	if (!(iss >> result) || !iss.eof())
+	if (!(iss >> result) || (iss.fail() && !iss.eof()))
 		throw InvalidConversion();
-
 	return result;
 }
 
@@ -62,4 +67,8 @@ bool Parsing::isValidNumber(std::string number) {
 
 const char *Parsing::InvalidConversion::what() const throw() {
 	return "Invalid conversion";
+}
+
+const char *Parsing::InvalidValueRange::what() const throw() {
+	return "Invalid Range, it must be number between 0 and 1000";
 }
