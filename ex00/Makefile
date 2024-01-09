@@ -3,6 +3,7 @@ NAME = btc
 SRC = src/main.cpp \
 	  src/BitcoinExchange.cpp \
 	  src/Date.cpp \
+	  src/Parsing.cpp
 
 OBJ = $(patsubst %.cpp, %.o, $(SRC))
 

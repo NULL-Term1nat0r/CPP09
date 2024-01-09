@@ -39,8 +39,7 @@ const char *BitcoinExchange::InvalidFileException::what() const throw() {
 }
 
 void BitcoinExchange::test() {
-	Date a = Date("2018-01-01");
-	std::cout << a._day << " " << a._month << " " << a.year << std::endl;
+	Date a = Date("2024-12-01");
 }
 
 bool BitcoinExchange::isValidNumber(std::string number) {
