@@ -54,12 +54,22 @@ bool Date::isValidDate(const std::string& date) {
 		return false;
 	if (month < 1 || month > 12 || (year == _currentYear && month > _currentMonth))
 		return false;
-	if (!_isValidDayInMonth(year, month, day) || (year == _currentYear && month == _currentMonth && day > _currentDay)) {
+	if (!_isValidDayInMonth(year, month, day) ||
+		(year == _currentYear && month == _currentMonth && day > _currentDay)) {
 		return false;
 	}
+	if (!_isDateBeforeDataBaseRange(year, month, day))
+		return false;
 	return true;
 }
 
+bool Date::_isDateBeforeDataBaseRange(int year, int month, int day) {
+	if (year < 2009)
+		return false;
+	if (year == 2009 && month == 1 && day < 2)
+		return false;
+	return true;
+}
 bool Date::_isValidDayInMonth(int year, int month, int day) {
 	if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12 ){
 		if (day <= 31)

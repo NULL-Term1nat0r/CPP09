@@ -138,7 +138,8 @@ void BitcoinExchange::getAccountBalance() {
 		double price = _exchangeRates[nearestDate];
 		double balance = amount * price;
 		std::cout << "["<< cyan << date << " " << amount << "] ----> ["<< nearestDate << " " << price << "] " << resetColor;
-		std::cout << magenta << "----> " << resetColor << boldBackgroundMagenta << balance << resetColor << std::endl;
+		std::cout << magenta << "----> " << resetColor << boldBackgroundMagenta << balance << resetColor;
+		std::cout << yellow << "$ (USD) (" << amount << " * " << price << ")" << resetColor << std::endl;
 		it++;
 	}
 }

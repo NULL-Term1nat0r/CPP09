@@ -35,6 +35,7 @@ public:
 	int _getCurrentDay();
 
 	bool _isValidDayInMonth(int year, int month, int day);
+	bool _isDateBeforeDataBaseRange(int year, int month, int day);
 	bool _isLeapYear(int year);
 
 	bool operator<(Date const &rhs) const;
