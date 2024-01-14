@@ -12,10 +12,6 @@
 
 #include "../includes/Colors.hpp"
 #include "../includes/Utils.hpp"
-#include <iostream>
-#include <sstream>
-#include <stack>
-#include <cmath>
 
 int main (int argc, char **argv){
 
